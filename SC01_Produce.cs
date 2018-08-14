@@ -146,6 +146,14 @@ public class SC_01_Produce
             results[r] = results[r2];
             results[r2] = t;
         }
+		
+		//产出果实
+            for (int i = 10; i < 19; i++)
+            {
+				
+                var r = RandomNext(0, maxProduceId ,seedArray);
+                results[i] = r;
+            }
         return results;
     }
 }
