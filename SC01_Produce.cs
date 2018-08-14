@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-public class SC01_Produce
+public class SC_01_Produce
 {
     #region 可回溯的随机算法
 
@@ -81,11 +81,21 @@ public class SC01_Produce
 
     static public int RandomNext(int minValue, int maxValue, int[] SeedArray)
     {
+        if (minValue > maxValue)
+        {
+            return 0;
+        }
+        else if (minValue == maxValue)
+        {
+            return minValue;
+        }
+
         long num = maxValue - minValue;
         if (num <= int.MaxValue)
         {
             var si = Sample(SeedArray);
-            return (int) (si % maxValue) + minValue;
+            var r = (int) (si % num);
+            return r + minValue;
         }
 
         return -9999;
@@ -93,50 +103,49 @@ public class SC01_Produce
 
     #endregion
 
-    public static Int32[] Main(Int32 time, Int32 maxProduceId)
+    public static Int32[] Main(Int32 seed, Int32 maxProduceId)
     {
         //magic code for hash
         string magicstr = "2018.8.9";
 
         int[] results = new int[20];
         int[] seedArray = new int[58];
-        InitRandom(time, seedArray);
-        
-        int min = 0;
-        //step.1 生成最大的果实下标
-        int max = RandomNext(2, 90, seedArray);
-
-        //先瓜分总额100
-        int all = 100;
-        for (int i = 0; i < 9; i++)
+        InitRandom(seed, seedArray);
+        int min = 100;
+        int max = 10000;
+        //先随机出多少赢：
+        int winCount = 0;
+        winCount =RandomNext(1, 600 ,seedArray)%6 +1;
+        int failCount = 10 - winCount;
+        //1.给输的人发奖
+        int failAmount = 0;
+        for (int i = 0; i < failCount; i++)
         {
-            var r = RandomNext(min, (int) (max * all / 100), seedArray);
-            all = all - r;
+            var r = RandomNext(100, 800,seedArray);
+            results[i] = r;
+            failAmount += r;
+        }
+            
+        //给赢得人发奖
+        int winAmount = (10000 - failAmount) - 1000 * winCount;
+        for (int i = failCount; i < 9; i++)
+        {
+            var r = RandomNext(1000,winAmount+1000,seedArray);
+            winAmount = winAmount - (r - 1000);
             results[i] = r;
         }
-
-        results[9] = all;
-
-
+        //最后一个人获得剩下所有
+        results[9] = 1000 + winAmount;
+            
         //打乱顺序
         for (int i = 0; i < 10; i++)
         {
-            var r = RandomNext(0, 10, seedArray);
-            var r2 = RandomNext(0, 10, seedArray);
+            var r =  RandomNext(0, 10 ,seedArray);
+            var r2 = RandomNext(0, 10 ,seedArray);
             var t = results[r];
             results[r] = results[r2];
             results[r2] = t;
         }
-
-
-        //产出果实
-
-        for (int i = 10; i < 19; i++)
-        {
-            var r = RandomNext(1, maxProduceId, seedArray);
-            results[i] = r;
-        }
-
         return results;
     }
 }
